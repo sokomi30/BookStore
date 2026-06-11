@@ -6,8 +6,10 @@ using BookStore.Application.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseInMemoryDatabase("BookStoreDb"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+
 
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile<BookProfile>());
 builder.Services.AddValidatorsFromAssemblyContaining<CreateBookValidator>();
@@ -17,10 +19,10 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Seed данных - одна строка вместо кучи кода
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    context.Database.Migrate();
     DbSeeder.Seed(context);
 }
 
