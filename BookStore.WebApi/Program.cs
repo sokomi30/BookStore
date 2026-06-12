@@ -1,17 +1,19 @@
+using BookStore.WebApi.Middleware;
 using BookStore.WebApi.Extensions;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Все регистрации — через методы расширения
 builder.Services.AddBookStoreDatabase(builder.Configuration);
 builder.Services.AddBookStoreServices();
 builder.Services.AddBookStoreSwagger();
 
 builder.Services.AddControllers()
-    .AddBookStoreJsonOptions();
+    .AddBookStoreJsonOptions()
+    .AddBookStoreValidation(); // ← валидация
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>(); // ← middleware ошибок
 
 await app.UseDatabaseSeedingAsync();
 

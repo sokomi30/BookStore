@@ -81,6 +81,8 @@ namespace BookStore.Infrastructure.Services
         }
         public async Task<PaginatedResult<BookDto>> GetPaginatedAsync(int page, int pageSize)
         {
+            pageSize = Math.Clamp(pageSize, 1, 50); // Минимум 1, максимум 50
+
             var totalCount = await _context.Books.CountAsync();
 
             var books = await _context.Books
