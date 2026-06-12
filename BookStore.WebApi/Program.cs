@@ -1,25 +1,47 @@
-using BookStore.WebApi.Middleware;
+using Serilog;
 using BookStore.WebApi.Extensions;
+using BookStore.WebApi.Middleware;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateLogger();
 
-builder.Services.AddBookStoreDatabase(builder.Configuration);
-builder.Services.AddBookStoreServices();
-builder.Services.AddBookStoreSwagger();
+try
+{
+    var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers()
-    .AddBookStoreJsonOptions()
-    .AddBookStoreValidation(); // ← валидация
+    builder.Host.UseSerilog();
 
-var app = builder.Build();
+    builder.Services.AddBookStoreDatabase(builder.Configuration);
+    builder.Services.AddBookStoreServices(builder.Configuration);
+    builder.Services.AddBookStoreSwagger();
+    builder.Services.AddBookStoreRateLimiting();
 
-app.UseMiddleware<ExceptionMiddleware>(); // ← middleware ошибок
+    builder.Services.AddControllers()
+        .AddBookStoreJsonOptions()
+        .AddBookStoreValidation();
 
-await app.UseDatabaseSeedingAsync();
+    var app = builder.Build();
 
-app.UseBookStoreSwagger();
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
+    app.UseMiddleware<ExceptionMiddleware>();
+    app.UseSerilogRequestLogging();
+    app.UseRateLimiter();
+    app.UseAuthentication();
+    app.UseAuthorization();
 
-app.Run();
+    await app.UseDatabaseSeedingAsync();
+
+    app.UseBookStoreSwagger();
+    app.UseHttpsRedirection();
+    app.MapControllers();
+
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

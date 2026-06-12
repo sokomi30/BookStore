@@ -8,17 +8,21 @@ A RESTful web service for managing books and authors built with **.NET 10** and 
 - **Entity Framework Core** — ORM for PostgreSQL
 - **AutoMapper** — Entity-to-DTO mapping
 - **FluentValidation** — Request validation
+- **JWT Authentication** — Role-based access control (User / Admin)
+- **Serilog** — Structured logging
 - **PostgreSQL** — Database (Docker)
 - **Swagger** — API documentation
 
 ## 📁 Architecture
+
 ```
 BookStore.sln
-├── BookStore.Domain # Entities (Author, Book, User)
-├── BookStore.Application # DTOs, Services, Validators, AutoMapper
-├── BookStore.Infrastructure # EF Core, DbContext, Data Seeder
-└── BookStore.WebApi # Controllers, DI, Program.cs
+├── BookStore.Domain          # Entities (Author, Book, User)
+├── BookStore.Application     # DTOs, Services, Validators, AutoMapper
+├── BookStore.Infrastructure  # EF Core, DbContext, Data Seeder
+└── BookStore.WebApi          # Controllers, Middleware, DI, Program.cs
 ```
+
 ## 🔧 Getting Started
 
 ### 1. Start PostgreSQL
@@ -30,52 +34,78 @@ docker compose up -d
 ```bash
 dotnet ef database update --project BookStore.Infrastructure --startup-project BookStore.WebApi
 ```
+
 ### 3. Run the Application
 ```bash
 dotnet run --project BookStore.WebApi
 ```
 
 ### 4. Open Swagger
-http://localhost:5223/swagger
+```
+http://localhost:5000/swagger
+```
 
+## 🔐 Authentication
 
-📡 API Endpoints
----
-Books
----
-| Method |	URL	| Description |  
-|-------|-----|----------|
-GET	| /api/books |	Get all books
-GET	| /api/books/{id} |	Get book by ID 
-GET	| /api/books/search?title=&author= |	Search books
-GET	| /api/books/paginated?page=1&pageSize=10 |	Get paginated books
-POST |	/api/books	| Create a book  
-PUT	| /api/books/{id}	| Update a book  
-DELETE |	/api/books/{id}	| Delete a book
----
-Authors
----
-| Method |	URL	| Description |
-|-------|-----|----------|    
-GET	| /api/authors	| Get all authors
-GET	| /api/authors/{id}	| Get author by ID
-POST |	/api/authors	| Create an author
-PUT	| /api/authors/{id} |	Update an author  
-DELETE |	/api/authors/{id} |	Delete an author
----
+| Endpoint | Description | Access |
+|----------|-------------|--------|
+| `POST /api/auth/register` | Register new user | Public |
+| `POST /api/auth/login` | Login, get JWT token | Public (rate limited: 5/min) |
 
-### 📦 Seed Data
-On first run, the application automatically creates 20 authors and 100 books via IDataSeeder.
+### Default Admin (Development)
+```
+Username: admin
+Password: from appsettings.Development.json
+```
 
-### ✅ Roadmap
+## 📡 API Endpoints
 
-- Book CRUD
-- Author CRUD
-- DTOs + AutoMapper
-- FluentValidation
-- Service layer
-- Clean architecture
-- PostgreSQL + Migrations
-- Search & Pagination
-- JWT Authentication
-- Docker for WebApi 
+### Books
+| Method | URL | Description | Access |
+|--------|-----|-------------|--------|
+| GET | `/api/books` | Get all books | Public |
+| GET | `/api/books/{id}` | Get book by ID | Public |
+| GET | `/api/books/search?title=&author=` | Search books | Public |
+| GET | `/api/books/paginated?page=1&pageSize=10` | Get paginated books | Public |
+| POST | `/api/books` | Create a book | Admin |
+| PUT | `/api/books/{id}` | Update a book | Admin |
+| DELETE | `/api/books/{id}` | Delete a book | Admin |
+
+### Authors
+| Method | URL | Description | Access |
+|--------|-----|-------------|--------|
+| GET | `/api/authors` | Get all authors | Public |
+| GET | `/api/authors/{id}` | Get author by ID | Public |
+| POST | `/api/authors` | Create an author | Admin |
+| PUT | `/api/authors/{id}` | Update an author | Admin |
+| DELETE | `/api/authors/{id}` | Delete an author | Admin |
+
+## 🛡️ Security
+
+- **JWT** with role-based authorization (User / Admin)
+- **BCrypt** password hashing
+- **Rate limiting** on login endpoint (5 requests/min)
+- **Input validation** via FluentValidation
+- **Global exception handling** middleware
+- **JWT key** stored in environment variables (not in repository)
+
+## 📦 Seed Data
+
+On first run, the application automatically creates **20 authors** and **100 books** via `IDataSeeder`.
+
+## ✅ Roadmap
+
+- [x] Book CRUD
+- [x] Author CRUD
+- [x] DTOs + AutoMapper
+- [x] FluentValidation
+- [x] Service layer
+- [x] Clean architecture
+- [x] PostgreSQL + Migrations
+- [x] Search & Pagination
+- [x] JWT Authentication
+- [x] Role-based authorization
+- [x] Rate limiting
+- [x] Structured logging (Serilog)
+- [ ] Unit & Integration tests
+- [ ] Docker for WebApi

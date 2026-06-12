@@ -5,7 +5,7 @@ using BookStore.Application.Services;
 using BookStore.Domain.Models;
 using BookStore.Infrastructure.Data;
 
-namespace BookStore.Infrastructure.Services
+namespace BookStore.Application.Services
 {
     public class BookService : IBookService
     {
