@@ -1,37 +1,21 @@
-using Microsoft.EntityFrameworkCore;
-using FluentValidation;
-using BookStore.Infrastructure.Data;
-using BookStore.Application.Validators;
-using BookStore.Application.Mappings;
+using BookStore.WebApi.Extensions;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// PostgreSQL
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+// Все регистрации — через методы расширения
+builder.Services.AddBookStoreDatabase(builder.Configuration);
+builder.Services.AddBookStoreServices();
+builder.Services.AddBookStoreSwagger();
 
-
-builder.Services.AddAutoMapper(cfg => cfg.AddProfile<BookProfile>());
-builder.Services.AddValidatorsFromAssemblyContaining<CreateBookValidator>();
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddControllers()
+    .AddBookStoreJsonOptions();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    context.Database.Migrate();
-    DbSeeder.Seed(context);
-}
+await app.UseDatabaseSeedingAsync();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
+app.UseBookStoreSwagger();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

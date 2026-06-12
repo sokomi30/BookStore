@@ -1,10 +1,9 @@
-﻿namespace BookStore.Domain.Models
+﻿namespace BookStore.Application.DTOs
 {
-    public class Author
+    public class AuthorDto
     {
         public int Id { get; set; }
         public string FullName { get; set; } = string.Empty;
         public DateTime BirthDate { get; set; }
-        public ICollection<Book> Books { get; set; } = new List<Book>();
     }
 }
