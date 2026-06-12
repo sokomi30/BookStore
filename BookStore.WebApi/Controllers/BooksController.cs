@@ -1,9 +1,6 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BookStore.Infrastructure.Data;      
-using BookStore.Domain.Models;              
-using BookStore.Application.DTOs;           
+﻿using Microsoft.AspNetCore.Mvc;
+using BookStore.Application.DTOs;
+using BookStore.Application.Services;
 
 namespace BookStore.WebApi.Controllers;
 
@@ -11,54 +8,68 @@ namespace BookStore.WebApi.Controllers;
 [Route("api/[controller]")]
 public class BooksController : ControllerBase
 {
-    private readonly AppDbContext _context;
-    private readonly IMapper _mapper;
+    private readonly IBookService _bookService;
 
-    public BooksController(AppDbContext context, IMapper mapper)
+    public BooksController(IBookService bookService)
     {
-        _context = context;
-        _mapper = mapper;
+        _bookService = bookService;
     }
 
     // GET: api/books
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var books = await _context.Books.Include(b => b.Author).ToListAsync();
-        var booksDto = _mapper.Map<List<BookDto>>(books);
-        return Ok(booksDto);
+        var books = await _bookService.GetAllAsync();
+        return Ok(books);
     }
 
-    // POST: api/books
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateBookDto dto)
+    // GET: api/books/search?title=Война&author=Толстой
+    [HttpGet("search")]
+    public async Task<IActionResult> Search([FromQuery] string? title, [FromQuery] string? author)
     {
-        var book = _mapper.Map<Book>(dto);
-
-        // Проверяем, что автор существует
-        var authorExists = await _context.Authors.AnyAsync(a => a.Id == dto.AuthorId);
-        if (!authorExists)
-            return BadRequest("Автор не найден");
-
-        await _context.Books.AddAsync(book);
-        await _context.SaveChangesAsync();
-
-        var bookDto = _mapper.Map<BookDto>(book);
-        return CreatedAtAction(nameof(GetById), new { id = book.Id }, bookDto);
+        var books = await _bookService.SearchAsync(title, author);
+        return Ok(books);
     }
 
     // GET: api/books/{id}
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var book = await _context.Books
-            .Include(b => b.Author)
-            .FirstOrDefaultAsync(b => b.Id == id);
+        var book = await _bookService.GetByIdAsync(id);
+        if (book == null) return NotFound();
+        return Ok(book);
+    }
 
-        if (book == null)
-            return NotFound();
+    // POST: api/books
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreateBookDto dto)
+    {
+        var book = await _bookService.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = book.Id }, book);
+    }
 
-        var bookDto = _mapper.Map<BookDto>(book);
-        return Ok(bookDto);
+    // PUT: api/books/{id}
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, [FromBody] CreateBookDto dto)
+    {
+        var book = await _bookService.UpdateAsync(id, dto);
+        if (book == null) return NotFound();
+        return Ok(book);
+    }
+
+    // DELETE: api/books/{id}
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var deleted = await _bookService.DeleteAsync(id);
+        if (!deleted) return NotFound();
+        return NoContent();
+    }
+    // GET: api/books/paginated?page=1&pageSize=10
+    [HttpGet("paginated")]
+    public async Task<IActionResult> GetPaginated([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    {
+        var result = await _bookService.GetPaginatedAsync(page, pageSize);
+        return Ok(result);
     }
 }

@@ -64,5 +64,38 @@ namespace BookStore.Infrastructure.Services
             await _context.SaveChangesAsync();
             return true;
         }
+        public async Task<List<BookDto>> SearchAsync(string? title, string? author)
+        {
+            var query = _context.Books
+                .Include(b => b.Author)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(title))
+                query = query.Where(b => b.Title.Contains(title));
+
+            if (!string.IsNullOrWhiteSpace(author))
+                query = query.Where(b => b.Author.FullName.Contains(author));
+
+            var books = await query.ToListAsync();
+            return _mapper.Map<List<BookDto>>(books);
+        }
+        public async Task<PaginatedResult<BookDto>> GetPaginatedAsync(int page, int pageSize)
+        {
+            var totalCount = await _context.Books.CountAsync();
+
+            var books = await _context.Books
+                .Include(b => b.Author)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PaginatedResult<BookDto>
+            {
+                Items = _mapper.Map<List<BookDto>>(books),
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+        }
     }
 }
