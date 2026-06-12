@@ -1,79 +1,81 @@
 # 📚 BookStore API
 
-Веб-сервис для управления книгами и авторами на **.NET 10** с **PostgreSQL**.
+A RESTful web service for managing books and authors built with **.NET 10** and **PostgreSQL**.
 
-## 🚀 Технологии
+## 🚀 Tech Stack
 
 - **.NET 10 Web API** — REST API
-- **Entity Framework Core** — ORM для PostgreSQL
-- **AutoMapper** — маппинг сущностей в DTO
-- **FluentValidation** — валидация входящих данных
-- **PostgreSQL** — база данных (Docker)
-- **Swagger** — документация API
+- **Entity Framework Core** — ORM for PostgreSQL
+- **AutoMapper** — Entity-to-DTO mapping
+- **FluentValidation** — Request validation
+- **PostgreSQL** — Database (Docker)
+- **Swagger** — API documentation
 
-## 📁 Архитектура
+## 📁 Architecture
 ```
 BookStore.sln
-├── BookStore.Domain # Сущности (Author, Book, User)
-├── BookStore.Application # DTO, сервисы, валидаторы, AutoMapper
-├── BookStore.Infrastructure # EF Core, DbContext, сидер
-└── BookStore.WebApi # Контроллеры, DI, Program.cs
+├── BookStore.Domain # Entities (Author, Book, User)
+├── BookStore.Application # DTOs, Services, Validators, AutoMapper
+├── BookStore.Infrastructure # EF Core, DbContext, Data Seeder
+└── BookStore.WebApi # Controllers, DI, Program.cs
 ```
-## 🔧 Запуск
+## 🔧 Getting Started
 
-### 1. Поднять PostgreSQL
+### 1. Start PostgreSQL
 ```bash
 docker compose up -d
 ```
 
-### 2.Применить миграции
+### 2. Apply Migrations
 ```bash
 dotnet ef database update --project BookStore.Infrastructure --startup-project BookStore.WebApi
 ```
-### 3. Запустить приложение
+### 3. Run the Application
 ```bash
 dotnet run --project BookStore.WebApi
 ```
 
-### 4. Открыть Swagger
+### 4. Open Swagger
 http://localhost:5223/swagger
 
 
-📡 API
+📡 API Endpoints
 ---
-Книги
+Books
 ---
-| Метод |	URL |	Описание |  
+| Method |	URL	| Description |  
 |-------|-----|----------|
-GET	| /api/books |	Все книги  
-GET	| /api/books/{id} |	Книга по ID  
-POST |	/api/books	| Создать книгу  
-PUT	| /api/books/{id}	| Обновить книгу  
-DELETE |	/api/books/{id}	| Удалить книгу  
+GET	| /api/books |	Get all books
+GET	| /api/books/{id} |	Get book by ID 
+GET	| /api/books/search?title=&author= |	Search books
+GET	| /api/books/paginated?page=1&pageSize=10 |	Get paginated books
+POST |	/api/books	| Create a book  
+PUT	| /api/books/{id}	| Update a book  
+DELETE |	/api/books/{id}	| Delete a book
 ---
-Авторы
+Authors
 ---
-| Метод	| URL	| Описание|
+| Method |	URL	| Description |
 |-------|-----|----------|    
-GET	| /api/authors	| Все авторы  
-GET	| /api/authors/{id}	| Автор по ID  
-POST |	/api/authors	| Создать автора  
-PUT	| /api/authors/{id} |	Обновить автора  
-DELETE |	/api/authors/{id} |	Удалить автора  
+GET	| /api/authors	| Get all authors
+GET	| /api/authors/{id}	| Get author by ID
+POST |	/api/authors	| Create an author
+PUT	| /api/authors/{id} |	Update an author  
+DELETE |	/api/authors/{id} |	Delete an author
 ---
 
-### 📦 Тестовые данные
-При запуске автоматически создаётся 20 авторов и 100 книг через IDataSeeder.
+### 📦 Seed Data
+On first run, the application automatically creates 20 authors and 100 books via IDataSeeder.
 
-### ✅ Что готово
+### ✅ Roadmap
 
-- CRUD для книг  
-- CRUD для авторов  
-- DTO + AutoMapper  
-- Валидация FluentValidation  
-- Сервисный слой  
-- Чистая архитектура  
-- PostgreSQL + миграции  
-- Поиск книг  
-- JWT авторизация  
-- Docker для WebApi  
+- Book CRUD
+- Author CRUD
+- DTOs + AutoMapper
+- FluentValidation
+- Service layer
+- Clean architecture
+- PostgreSQL + Migrations
+- Search & Pagination
+- JWT Authentication
+- Docker for WebApi 
