@@ -1,5 +1,7 @@
 # 📚 BookStore API
 
+[![.NET Build & Tests](https://github.com/sokomi30/BookStore/actions/workflows/dotnet.yml/badge.svg)](https://github.com/sokomi30/BookStore/actions/workflows/dotnet.yml)
+
 A RESTful web service for managing books and authors built with **.NET 10** and **PostgreSQL**.
 
 ## 🚀 Tech Stack

@@ -1,0 +1,49 @@
+name: .NET Build & Tests
+
+on:
+  push:
+    branches: [ main, feature/* ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: bookstore
+          POSTGRES_PASSWORD: bookstore123
+          POSTGRES_DB: bookstore
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+
+    - name: Run tests
+      run: dotnet test --no-build --configuration Release --verbosity normal
+      env:
+        ConnectionStrings__Default: Host=localhost;Port=5432;Database=bookstore;Username=bookstore;Password=bookstore123
+        JWT__Key: ThisIsASuperSecretKeyForJWT_AtLeast32Characters!
+        JWT__Issuer: BookStoreApi
+        JWT__Audience: BookStoreClient
