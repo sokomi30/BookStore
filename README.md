@@ -112,6 +112,7 @@ On first run, the application automatically creates **20 authors** and **100 boo
 
 ## ✅ Roadmap
 
+### Core
 - [x] Book CRUD
 - [x] Author CRUD
 - [x] DTOs + AutoMapper
@@ -119,10 +120,27 @@ On first run, the application automatically creates **20 authors** and **100 boo
 - [x] Service layer
 - [x] Clean architecture
 - [x] PostgreSQL + Migrations
+
+### API Features
 - [x] Search & Pagination
 - [x] JWT Authentication
-- [x] Role-based authorization
+- [x] Role-based authorization (User / Admin)
+- [x] Refresh tokens
 - [x] Rate limiting
+- [x] Global exception handling
 - [x] Structured logging (Serilog)
-- [x] Unit & Integration tests
-- [x] Docker for WebApi
+
+### DevOps
+- [x] Docker Compose (one-command run)
+- [x] CI/CD (GitHub Actions)
+- [ ] Kubernetes deployment
+
+### Testing
+- [x] Unit tests (25)
+- [x] Integration tests (7)
+- [ ] API tests (Postman / Bruno collection)
+
+### Frontend
+- [ ] React + TypeScript SPA
+- [ ] Admin panel
+- [ ] Book cover upload

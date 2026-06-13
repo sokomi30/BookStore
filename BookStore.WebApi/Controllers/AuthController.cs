@@ -49,5 +49,17 @@ namespace BookStore.WebApi.Controllers
             Log.Information("User {Username} logged in", dto.Username);
             return Ok(result);
         }
+
+        [HttpPost("refresh")]
+        [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenDto dto)
+        {
+            var result = await _authService.RefreshTokenAsync(dto.RefreshToken);
+            if (result == null)
+                return Unauthorized(new { message = "Invalid or expired refresh token" });
+
+            return Ok(result);
+        }
     }
 }

@@ -36,7 +36,9 @@ namespace BookStore.Application.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return GenerateToken(user);
+            var response = GenerateTokens(user);
+            await _context.SaveChangesAsync();
+            return response;
         }
 
         public async Task<AuthResponseDto?> LoginAsync(LoginDto dto)
@@ -45,10 +47,35 @@ namespace BookStore.Application.Services
             if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
                 return null;
 
-            return GenerateToken(user);
+            var response = GenerateTokens(user);
+            await _context.SaveChangesAsync();
+            return response;
         }
 
-        private AuthResponseDto GenerateToken(User user)
+        public async Task<AuthResponseDto?> RefreshTokenAsync(string refreshToken)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(
+                u => u.RefreshToken == refreshToken && u.RefreshTokenExpiry > DateTime.UtcNow);
+
+            if (user == null) return null;
+
+            var response = GenerateTokens(user);
+            await _context.SaveChangesAsync();
+            return response;
+        }
+
+        private string GenerateRefreshToken()
+        {
+            return Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+        }
+
+        private void SetRefreshToken(User user)
+        {
+            user.RefreshToken = GenerateRefreshToken();
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+        }
+
+        private AuthResponseDto GenerateTokens(User user)
         {
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
@@ -65,13 +92,16 @@ namespace BookStore.Application.Services
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(2),
+                expires: DateTime.UtcNow.AddMinutes(15),
                 signingCredentials: credentials
             );
+
+            SetRefreshToken(user);
 
             return new AuthResponseDto
             {
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
+                RefreshToken = user.RefreshToken,
                 Username = user.Username,
                 Role = user.Role
             };
