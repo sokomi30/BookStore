@@ -25,24 +25,39 @@ BookStore.sln
 
 ## 🔧 Getting Started
 
-### 1. Start PostgreSQL
+### Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+### Quick Start (one command)
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
 
-### 2. Apply Migrations
+### Open Swagger
+```
+http://localhost:5000/swagger
+```
+
+### Stop the application
+```bash
+docker compose down
+```
+
+### Development (run manually)
+
+#### 1. Start PostgreSQL
+```bash
+docker compose up -d postgres
+```
+
+#### 2. Apply migrations
 ```bash
 dotnet ef database update --project BookStore.Infrastructure --startup-project BookStore.WebApi
 ```
 
-### 3. Run the Application
+#### 3. Run WebApi
 ```bash
 dotnet run --project BookStore.WebApi
-```
-
-### 4. Open Swagger
-```
-http://localhost:5000/swagger
 ```
 
 ## 🔐 Authentication
@@ -108,4 +123,4 @@ On first run, the application automatically creates **20 authors** and **100 boo
 - [x] Rate limiting
 - [x] Structured logging (Serilog)
 - [x] Unit & Integration tests
-- [ ] Docker for WebApi
+- [x] Docker for WebApi

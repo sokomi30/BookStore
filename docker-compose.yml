@@ -12,6 +12,28 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bookstore"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  webapi:
+    build:
+      context: .
+      dockerfile: BookStore.WebApi/Dockerfile
+    container_name: bookstore_api
+    ports:
+      - "5000:8080"
+    environment:
+      - ConnectionStrings__Default=Host=postgres;Port=5432;Database=bookstore;Username=bookstore;Password=bookstore123
+      - JWT__Key=ThisIsASuperSecretKeyForJWT_AtLeast32Characters!
+      - JWT__Issuer=BookStoreApi
+      - JWT__Audience=BookStoreClient
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:
