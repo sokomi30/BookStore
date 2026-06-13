@@ -18,6 +18,12 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    container_name: bookstore_cache
+    ports:
+      - "6379:6379"
+
   webapi:
     build:
       context: .
@@ -30,6 +36,7 @@ services:
       - JWT__Key=ThisIsASuperSecretKeyForJWT_AtLeast32Characters!
       - JWT__Issuer=BookStoreApi
       - JWT__Audience=BookStoreClient
+      - Redis__ConnectionString=redis:6379
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       postgres:

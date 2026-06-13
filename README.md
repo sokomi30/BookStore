@@ -11,9 +11,13 @@ A RESTful web service for managing books and authors built with **.NET 10** and 
 - **AutoMapper** — Entity-to-DTO mapping
 - **FluentValidation** — Request validation
 - **JWT Authentication** — Role-based access control (User / Admin)
+- **Redis** — Distributed caching
 - **Serilog** — Structured logging
 - **PostgreSQL** — Database (Docker)
+- **Docker Compose** — One-command startup
 - **Swagger** — API documentation
+- **GitHub Actions** — CI/CD pipeline
+- **xUnit + Moq** — 32 tests (unit + integration)
 
 ## 📁 Architecture
 
@@ -129,6 +133,7 @@ On first run, the application automatically creates **20 authors** and **100 boo
 - [x] Rate limiting
 - [x] Global exception handling
 - [x] Structured logging (Serilog)
+- [x] Redis caching
 
 ### DevOps
 - [x] Docker Compose (one-command run)

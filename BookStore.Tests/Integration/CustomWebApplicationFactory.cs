@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BookStore.Tests.Integration
@@ -11,9 +12,11 @@ namespace BookStore.Tests.Integration
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.UseSetting("ASPNETCORE_ENVIRONMENT", "Test");
+
             builder.ConfigureServices(services =>
             {
-                // Удаляем ВСЕ регистрации DbContext
+                // Удаляем PostgreSQL
                 var dbContextDescriptor = services.SingleOrDefault(
                     d => d.ServiceType == typeof(AppDbContext));
                 if (dbContextDescriptor != null)
@@ -29,13 +32,18 @@ namespace BookStore.Tests.Integration
                 if (dbContextOptionsFactoryDescriptor != null)
                     services.Remove(dbContextOptionsFactoryDescriptor);
 
-                // Регистрируем InMemory
                 services.AddDbContext<AppDbContext>(options =>
-                {
-                    options.UseInMemoryDatabase("TestDb");
-                });
+                    options.UseInMemoryDatabase("TestDb"));
 
-                // Seed данных
+                // Удаляем Redis и заменяем на MemoryCache
+                var redisDescriptor = services.SingleOrDefault(
+                    d => d.ServiceType == typeof(IDistributedCache));
+                if (redisDescriptor != null)
+                    services.Remove(redisDescriptor);
+
+                services.AddDistributedMemoryCache();
+
+                // Seed
                 var sp = services.BuildServiceProvider();
                 using var scope = sp.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();

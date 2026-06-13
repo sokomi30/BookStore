@@ -1,30 +1,57 @@
+using Serilog;
 using BookStore.WebApi.Extensions;
 using BookStore.WebApi.Middleware;
 
-var builder = WebApplication.CreateBuilder(args);
+try
+{
+    var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddBookStoreDatabase(builder.Configuration);
-builder.Services.AddBookStoreServices(builder.Configuration);
-builder.Services.AddBookStoreSwagger();
-builder.Services.AddBookStoreRateLimiting();
+    // Serilog только если не в тестах
+    if (!builder.Environment.IsEnvironment("Test"))
+    {
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console()
+            .CreateLogger();
+        builder.Host.UseSerilog();
+    }
 
-builder.Services.AddControllers()
-    .AddBookStoreJsonOptions()
-    .AddBookStoreValidation();
+    builder.Services.AddBookStoreDatabase(builder.Configuration);
+    builder.Services.AddBookStoreServices(builder.Configuration);
+    builder.Services.AddBookStoreSwagger();
+    builder.Services.AddBookStoreRateLimiting();
 
-var app = builder.Build();
+    builder.Services.AddControllers()
+        .AddBookStoreJsonOptions()
+        .AddBookStoreValidation();
 
-app.UseMiddleware<ExceptionMiddleware>();
-app.UseRateLimiter();
-app.UseAuthentication();
-app.UseAuthorization();
+    var app = builder.Build();
 
-await app.UseDatabaseSeedingAsync();
+    app.UseMiddleware<ExceptionMiddleware>();
 
-app.UseBookStoreSwagger();
-app.UseHttpsRedirection();
-app.MapControllers();
+    if (!builder.Environment.IsEnvironment("Test"))
+    {
+        app.UseSerilogRequestLogging();
+    }
 
-app.Run();
+    app.UseRateLimiter();
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    await app.UseDatabaseSeedingAsync();
+
+    app.UseBookStoreSwagger();
+    app.UseHttpsRedirection();
+    app.MapControllers();
+
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
 
 public partial class Program { }

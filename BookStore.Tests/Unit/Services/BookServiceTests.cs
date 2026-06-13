@@ -33,7 +33,8 @@ namespace BookStore.Tests.Unit.Services
             }, NullLoggerFactory.Instance);
             _mapper = config.CreateMapper();
 
-            _bookService = new BookService(_context, _mapper);
+            var cacheMock = new Mock<ICacheService>();
+            _bookService = new BookService(_context, _mapper, cacheMock.Object);
 
             SeedData();
         }

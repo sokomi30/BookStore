@@ -22,21 +22,18 @@ namespace BookStore.Tests.Integration.Controllers
 
         private async Task<string> GetAdminTokenAsync()
         {
-            // Регистрируем пользователя
             await _client.PostAsJsonAsync("/api/auth/register", new RegisterDto
             {
                 Username = "admin_test",
                 Password = "admin123"
             });
 
-            // Меняем роль на Admin в тестовой БД
             var scope = _factory.Services.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var user = await context.Users.FirstAsync(u => u.Username == "admin_test");
             user.Role = "Admin";
             await context.SaveChangesAsync();
 
-            // Логинимся
             var loginResponse = await _client.PostAsJsonAsync("/api/auth/login", new LoginDto
             {
                 Username = "admin_test",
@@ -51,6 +48,13 @@ namespace BookStore.Tests.Integration.Controllers
         public async Task GetBooks_ReturnsOk()
         {
             var response = await _client.GetAsync("/api/books");
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                Assert.Fail($"Expected OK, got {response.StatusCode}. Body: {body}");
+            }
+
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
@@ -93,6 +97,13 @@ namespace BookStore.Tests.Integration.Controllers
             };
 
             var response = await _client.PostAsJsonAsync("/api/books", dto);
+
+            if (response.StatusCode != HttpStatusCode.Created)
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                Assert.Fail($"Expected Created, got {response.StatusCode}. Body: {body}");
+            }
+
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
 
