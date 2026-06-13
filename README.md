@@ -107,5 +107,5 @@ On first run, the application automatically creates **20 authors** and **100 boo
 - [x] Role-based authorization
 - [x] Rate limiting
 - [x] Structured logging (Serilog)
-- [ ] Unit & Integration tests
+- [x] Unit & Integration tests
 - [ ] Docker for WebApi
