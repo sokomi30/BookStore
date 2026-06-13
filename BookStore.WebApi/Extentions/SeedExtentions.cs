@@ -12,7 +12,16 @@ namespace BookStore.WebApi.Extensions
             var seeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
             var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-            context.Database.Migrate();
+            // Только для реляционных БД (не InMemory)
+            if (context.Database.IsRelational())
+            {
+                context.Database.Migrate();
+            }
+            else
+            {
+                context.Database.EnsureCreated();
+            }
+
             await seeder.SeedAsync(context);
 
             if (app.Environment.IsDevelopment())
