@@ -38,41 +38,74 @@ BookStore.sln
 └── BookStore.WebApi          # Controllers, Middleware, DI, Program.cs
 ```
 
-## 🔧 Getting Started
+## 🚀 Full Startup Guide
 
 ### Prerequisites
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+- [Node.js 20+](https://nodejs.org/)
 
-### Quick Start (one command)
+### Option 1: Docker (recommended — one command)
+
 ```bash
+# Clone the repository
+git clone https://github.com/sokomi30/BookStore.git
+cd BookStore
+
+# Start everything (PostgreSQL + Redis + WebApi)
 docker compose up -d --build
 ```
 
-### Open Swagger
-```
-http://localhost:5000/swagger
-```
+Open Swagger: http://localhost:5000/swagger
 
-### Stop the application
+The frontend is included in the WebApi container.
+
+### Option 2: Manual Start (development)
+
+#### Backend
+
 ```bash
-docker compose down
-```
+# Start infrastructure
+docker compose up -d postgres redis
 
-### Development (run manually)
-
-#### 1. Start PostgreSQL
-```bash
-docker compose up -d postgres
-```
-
-#### 2. Apply migrations
-```bash
+# Apply migrations
 dotnet ef database update --project BookStore.Infrastructure --startup-project BookStore.WebApi
+
+# Run API
+dotnet run --project BookStore.WebApi
 ```
 
-#### 3. Run WebApi
+API: http://localhost:5000/swagger
+
+#### Frontend
+
 ```bash
-dotnet run --project BookStore.WebApi
+cd BookStore.Web
+npm install
+npm run dev
+```
+
+Frontend: http://localhost:5173 (or 5174)
+
+### Default Admin Account
+```
+Username: admin
+Password: set in appsettings.Development.json
+```
+
+### Running Tests
+
+```bash
+dotnet test
+```
+
+### Stopping
+
+```bash
+# Docker
+docker compose down
+
+# Manual — Ctrl+C in each terminal
 ```
 
 ## 🔐 Authentication
