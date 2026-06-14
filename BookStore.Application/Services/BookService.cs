@@ -49,7 +49,7 @@ namespace BookStore.Application.Services
                 query = query.Where(b => b.Title.Contains(title));
 
             if (!string.IsNullOrWhiteSpace(author))
-                query = query.Where(b => b.Author.FullName.Contains(author));
+                query = query.Where(b => b.Author.FullName.ToLower().Contains(author.ToLower()));
 
             var books = await query.ToListAsync();
             return _mapper.Map<List<BookDto>>(books);

@@ -11,7 +11,9 @@ public class BookProfile : Profile
         // Маппинг для книг
         CreateMap<Book, BookDto>()
             .ForMember(dest => dest.AuthorFullName,
-                       opt => opt.MapFrom(src => src.Author != null ? src.Author.FullName : "Неизвестен"));
+               opt => opt.MapFrom(src => src.Author != null ? src.Author.FullName : "Unknown"))
+            .ForMember(dest => dest.AuthorId,
+               opt => opt.MapFrom(src => src.AuthorId));
 
         CreateMap<CreateBookDto, Book>();
 

@@ -33,6 +33,8 @@ try
         app.UseSerilogRequestLogging();
     }
 
+    app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
     app.UseRateLimiter();
     app.UseAuthentication();
     app.UseAuthorization();
