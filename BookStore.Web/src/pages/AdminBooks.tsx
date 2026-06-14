@@ -9,10 +9,20 @@ function AdminBooks() {
   const [price, setPrice] = useState(0)
   const [authorId, setAuthorId] = useState(0)
   const [editId, setEditId] = useState<number | null>(null)
-
+  const [adminSearch, setAdminSearch] = useState('')
   useEffect(() => { loadBooks(); getAuthors().then(setAuthors) }, [])
-
-  const loadBooks = async () => { setBooks(await getBooks()) }
+  useEffect(() => { loadBooks() }, [adminSearch])
+  const loadBooks = async () => {
+    const allBooks = await getBooks()
+      if (adminSearch) {
+        setBooks(allBooks.filter(b => 
+          b.title.toLowerCase().includes(adminSearch.toLowerCase()) ||
+          b.authorFullName.toLowerCase().includes(adminSearch.toLowerCase())
+        ))
+      } else {
+        setBooks(allBooks)
+    }
+  }
 
   const resetForm = () => { setTitle(''); setIsbn(''); setPrice(0); setAuthorId(0); setEditId(null) }
 
@@ -38,8 +48,15 @@ function AdminBooks() {
           <option value={0}>Select author</option>
           {authors.map(a => <option key={a.id} value={a.id}>{a.fullName}</option>)}
         </select>
+        <input
+          className="border dark:border-gray-600 dark:bg-gray-700 rounded px-3 py-2 flex-1"
+          placeholder="Search books..."
+          value={adminSearch}
+          onChange={e => setAdminSearch(e.target.value)}
+        />
         <button className="bg-blue-500 text-white px-4 py-2 rounded" type="submit">{editId ? 'Update' : 'Create'}</button>
         {editId && <button className="bg-gray-300 px-4 py-2 rounded" onClick={resetForm}>Cancel</button>}
+        
       </form>
 
       <div className="space-y-2">
