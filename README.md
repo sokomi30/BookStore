@@ -6,6 +6,7 @@ A RESTful web service for managing books and authors built with **.NET 10** and 
 
 ## 🚀 Tech Stack
 
+### Backend
 - **.NET 10 Web API** — REST API
 - **Entity Framework Core** — ORM for PostgreSQL
 - **AutoMapper** — Entity-to-DTO mapping
@@ -13,9 +14,17 @@ A RESTful web service for managing books and authors built with **.NET 10** and 
 - **JWT Authentication** — Role-based access control (User / Admin)
 - **Redis** — Distributed caching
 - **Serilog** — Structured logging
+
+### Frontend
+- **React 19** — UI library
+- **TypeScript** — Type safety
+- **React Router** — Client-side routing
+- **Tailwind CSS** — Utility-first styling
+- **Axios** — HTTP client
+
+### DevOps
 - **PostgreSQL** — Database (Docker)
 - **Docker Compose** — One-command startup
-- **Swagger** — API documentation
 - **GitHub Actions** — CI/CD pipeline
 - **xUnit + Moq** — 32 tests (unit + integration)
 
@@ -146,6 +155,8 @@ On first run, the application automatically creates **20 authors** and **100 boo
 - [ ] API tests (Postman / Bruno collection)
 
 ### Frontend
-- [ ] React + TypeScript SPA
-- [ ] Admin panel
+- [x] React + TypeScript SPA
+- [x] Tailwind CSS styling
+- [x] Dark / Light theme
+- [x] Admin panel (books & authors)
 - [ ] Book cover upload
