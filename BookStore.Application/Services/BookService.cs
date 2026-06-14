@@ -46,7 +46,7 @@ namespace BookStore.Application.Services
             var query = _context.Books.Include(b => b.Author).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(title))
-                query = query.Where(b => b.Title.Contains(title));
+                query = query.Where(b => b.Title.ToLower().Contains(title.ToLower()));
 
             if (!string.IsNullOrWhiteSpace(author))
                 query = query.Where(b => b.Author.FullName.ToLower().Contains(author.ToLower()));

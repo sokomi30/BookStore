@@ -1,26 +1,27 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useLocation } from 'react-router-dom'
 import { getBookById, type BookDto } from '../api/books'
 
 function BookDetail() {
   const { id } = useParams()
+  const location = useLocation()
   const [book, setBook] = useState<BookDto | null>(null)
 
-  useEffect(() => {
-    if (id) {
-      getBookById(Number(id)).then(setBook)
-    }
-  }, [id])
+  // Берём search-параметры из предыдущей страницы
+  const searchParams = new URLSearchParams(location.state?.fromSearch || '').toString()
+  const backUrl = `/${searchParams ? `?${searchParams}` : ''}`
 
-  if (!book) return <p>Loading...</p>
+  useEffect(() => { if (id) getBookById(Number(id)).then(setBook) }, [id])
+
+  if (!book) return <p className="text-center mt-20">Loading...</p>
 
   return (
-    <div>
-      <h1>{book.title}</h1>
+    <div className="max-w-lg mx-auto mt-20 p-6 bg-white dark:bg-gray-800 rounded shadow">
+      <h1 className="text-2xl font-bold mb-4">{book.title}</h1>
       <p><strong>Author:</strong> {book.authorFullName}</p>
       <p><strong>ISBN:</strong> {book.isbn}</p>
       <p><strong>Price:</strong> ${book.price}</p>
-      <Link to="/">← Back to books</Link>
+      <Link to={backUrl} className="text-blue-500 mt-4 inline-block">← Back to books</Link>
     </div>
   )
 }

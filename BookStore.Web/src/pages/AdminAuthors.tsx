@@ -6,45 +6,35 @@ function AdminAuthors() {
   const [fullName, setFullName] = useState('')
   const [birthDate, setBirthDate] = useState('')
 
-  useEffect(() => {
-    loadAuthors()
-  }, [])
+  useEffect(() => { loadAuthors() }, [])
 
-  const loadAuthors = async () => {
-    const data = await getAuthors()
-    setAuthors(data)
-  }
+  const loadAuthors = async () => setAuthors(await getAuthors())
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     await createAuthor({ fullName, birthDate })
-    setFullName('')
-    setBirthDate('')
-    loadAuthors()
+    setFullName(''); setBirthDate(''); loadAuthors()
   }
 
   return (
-    <div>
-      <h1>Manage Authors</h1>
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-4">Manage Authors</h1>
 
-      <form onSubmit={handleSubmit}>
-        <input placeholder="Full Name" value={fullName} onChange={e => setFullName(e.target.value)} />
-        <input type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
-        <button type="submit">Create</button>
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-4 rounded shadow mb-6 flex gap-3">
+        <input className="border rounded px-3 py-2 flex-1" placeholder="Full Name" value={fullName} onChange={e => setFullName(e.target.value)} />
+        <input className="border rounded px-3 py-2" type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
+        <button className="bg-blue-500 text-white px-4 py-2 rounded" type="submit">Create</button>
       </form>
 
-      <ul>
+      <div className="space-y-2">
         {authors.map(author => (
-          <li key={author.id}>
-            {author.fullName} — {new Date(author.birthDate).toLocaleDateString()}
-            <button onClick={() => {
-                 if (window.confirm('Are you sure you want to delete this author?')) {
-                     deleteAuthor(author.id).then(loadAuthors)
-                    }
-            }}>Delete</button>
-          </li>
+          <div key={author.id} className="bg-white dark:bg-gray-800 rounded shadow p-3 flex justify-between items-center">
+            <span>{author.fullName} — {new Date(author.birthDate).toLocaleDateString()}</span>
+            <button onClick={() => { if (window.confirm('Delete?')) deleteAuthor(author.id).then(loadAuthors) }}
+              className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }

@@ -16,31 +16,21 @@ function Register() {
       const data = await registerApi(username, password)
       login(data)
       navigate('/')
-    } catch (err: any) {
-        setError(err.message || 'Registration failed')
-    }
+    } catch (err: any) { setError(err.message || 'Registration failed') }
   }
 
   return (
-    <div>
-      <h1>Register</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-        />
-        <button type="submit">Register</button>
+    <div className="max-w-sm mx-auto mt-20 p-6 bg-white dark:bg-gray-800 rounded shadow">
+      <h1 className="text-2xl font-bold mb-4">Register</h1>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <input className="border rounded px-3 py-2" placeholder="Username"
+          value={username} onChange={e => setUsername(e.target.value)} />
+        <input className="border rounded px-3 py-2" type="password" placeholder="Password"
+          value={password} onChange={e => setPassword(e.target.value)} />
+        <button className="bg-green-500 text-white py-2 rounded" type="submit">Register</button>
       </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <p>Already have an account? <Link to="/login">Login</Link></p>
+      {error && <p className="text-red-500 mt-2">{error}</p>}
+      <p className="mt-4 text-sm">Already have an account? <Link to="/login" className="text-blue-500">Login</Link></p>
     </div>
   )
 }
