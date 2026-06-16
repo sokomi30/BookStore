@@ -17,6 +17,10 @@ function BookDetail() {
 
   return (
     <div className="max-w-lg mx-auto mt-20 p-6 bg-white dark:bg-gray-800 rounded shadow">
+      {book.coverImagePath && (
+        <img src={book.coverImagePath} alt={book.title}
+          className="w-16 h-24 object-cover rounded mr-4" />
+      )}
       <h1 className="text-2xl font-bold mb-4">{book.title}</h1>
       <p><strong>Author:</strong> {book.authorFullName}</p>
       <p><strong>ISBN:</strong> {book.isbn}</p>

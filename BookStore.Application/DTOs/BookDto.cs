@@ -7,6 +7,7 @@
         public string Title { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public int AuthorId { get; set; }
-        public string AuthorFullName { get; set; } = string.Empty; // Достанем только имя, а не весь объект
+        public string AuthorFullName { get; set; } = string.Empty;
+        public string? CoverImagePath { get; set; }
     }
 }

@@ -13,7 +13,8 @@ public class BookProfile : Profile
             .ForMember(dest => dest.AuthorFullName,
                opt => opt.MapFrom(src => src.Author != null ? src.Author.FullName : "Unknown"))
             .ForMember(dest => dest.AuthorId,
-               opt => opt.MapFrom(src => src.AuthorId));
+               opt => opt.MapFrom(src => src.AuthorId))
+            .ForMember(dest => dest.CoverImagePath, opt => opt.MapFrom(src => src.CoverImagePath));
 
         CreateMap<CreateBookDto, Book>();
 

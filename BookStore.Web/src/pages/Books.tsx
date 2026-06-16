@@ -97,14 +97,20 @@ function Books() {
       <div className="grid gap-3">
         {books.map(book => (
           <Link
-            key={book.id}
-            to={`/books/${book.id}`}
-            state={{ fromSearch: window.location.search }}
-            className="bg-white dark:bg-gray-800 rounded shadow p-4 hover:shadow-md transition"
-          >
+              key={book.id}
+          to={`/books/${book.id}`}
+          state={{ fromSearch: window.location.search }}
+          className="bg-white dark:bg-gray-800 rounded shadow p-4 hover:shadow-md transition flex items-center"
+        >
+          {book.coverImagePath && (
+          <img src={book.coverImagePath} alt={book.title}
+              className="w-16 h-24 object-cover rounded mr-4" />
+          )}
+          <div>
             <h2 className="font-semibold text-lg">{book.title}</h2>
             <p className="text-gray-500 dark:text-gray-400">{book.authorFullName} — ${book.price}</p>
-          </Link>
+          </div>
+        </Link>
         ))}
       </div>
 

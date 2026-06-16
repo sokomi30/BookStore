@@ -64,3 +64,7 @@ export const getBooks = async () => {
   const { data } = await API.get<BookDto[]>('/books')
   return data
 }
+export const getCoverUrl = (coverPath: string | null | undefined): string | null => {
+  if (!coverPath) return null
+  return `http://localhost:5000${coverPath}`
+}

@@ -43,6 +43,7 @@ try
 
     app.UseBookStoreSwagger();
     app.UseHttpsRedirection();
+    app.UseStaticFiles();
     app.MapControllers();
 
     app.Run();

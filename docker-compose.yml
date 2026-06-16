@@ -31,6 +31,8 @@ services:
     container_name: bookstore_api
     ports:
       - "5000:8080"
+    volumes:
+      - covers_data:/app/wwwroot/covers
     environment:
       - ConnectionStrings__Default=Host=postgres;Port=5432;Database=bookstore;Username=bookstore;Password=bookstore123
       - JWT__Key=ThisIsASuperSecretKeyForJWT_AtLeast32Characters!
@@ -42,5 +44,16 @@ services:
       postgres:
         condition: service_healthy
 
+  frontend:
+    build:
+      context: ./BookStore.Web
+      dockerfile: Dockerfile
+    container_name: bookstore_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - webapi
+
 volumes:
   postgres_data:
+  covers_data:

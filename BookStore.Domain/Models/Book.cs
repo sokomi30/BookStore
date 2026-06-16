@@ -8,5 +8,6 @@
         public decimal Price { get; set; }
         public int AuthorId { get; set; }
         public Author Author { get; set; } = null!;
+        public string? CoverImagePath { get; set; }
     }
 }

@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using BookStore.Application.DTOs;
+﻿using BookStore.Application.DTOs;
 using BookStore.Application.Services;
+using BookStore.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
 namespace BookStore.WebApi.Controllers
@@ -13,10 +14,12 @@ namespace BookStore.WebApi.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IBookService _bookService;
+        private readonly AppDbContext _context;
 
-        public BooksController(IBookService bookService)
+        public BooksController(IBookService bookService, AppDbContext context)
         {
             _bookService = bookService;
+            _context = context;
         }
 
         [HttpGet]
@@ -86,6 +89,35 @@ namespace BookStore.WebApi.Controllers
             if (!deleted) return NotFound();
             Log.Information("Book {Id} deleted by {Username}", id, User.Identity?.Name);
             return NoContent();
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("{id}/cover")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UploadCover(int id, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded");
+
+            var book = await _context.Books.FindAsync(id);
+            if (book == null) return NotFound();
+
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "covers");
+            Directory.CreateDirectory(uploadsFolder);
+
+            var fileName = $"{id}_{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            book.CoverImagePath = $"/covers/{fileName}";
+            await _context.SaveChangesAsync();
+
+            return Ok(new { coverPath = book.CoverImagePath });
         }
     }
 }

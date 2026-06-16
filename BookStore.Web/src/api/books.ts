@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API = axios.create({ baseURL: 'http://localhost:5000/api' })
+const API = axios.create({ baseURL: '/api' })
 
 API.interceptors.request.use(config => {
   const saved = localStorage.getItem('user')
@@ -11,6 +11,10 @@ API.interceptors.request.use(config => {
   return config
 })
 
+export const getCoverUrl = (coverPath: string | null | undefined): string | undefined => {
+  if (!coverPath) return undefined
+  return coverPath
+}
 export interface BookDto {
   id: number
   isbn: string
@@ -18,6 +22,7 @@ export interface BookDto {
   price: number
   authorId: number
   authorFullName: string
+  coverImagePath?: string | null
 }
 
 export interface PaginatedResult {

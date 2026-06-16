@@ -23,7 +23,22 @@ function AdminBooks() {
         setBooks(allBooks)
     }
   }
+  // Функция загрузки
+  const handleUploadCover = async (bookId: number, file: File) => {
+  const formData = new FormData()
+  formData.append('file', file)
 
+  const saved = localStorage.getItem('user')
+  const token = saved ? JSON.parse(saved).token : ''
+
+  await fetch(`http://localhost:5000/api/books/${bookId}/cover`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+    body: formData
+  })
+
+  loadBooks()
+}
   const resetForm = () => { setTitle(''); setIsbn(''); setPrice(0); setAuthorId(0); setEditId(null) }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,6 +79,15 @@ function AdminBooks() {
           <div key={book.id} className="bg-white dark:bg-gray-800 rounded shadow p-3 flex justify-between items-center">
             <span>{book.title} — {book.authorFullName} — ${book.price}</span>
             <div className="flex gap-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={e => {
+                    const file = e.target.files?.[0]
+                    if (file) handleUploadCover(book.id, file)
+                  }}
+                  className="text-sm"
+                />
               <button onClick={() => { setEditId(book.id); setTitle(book.title); setIsbn(book.isbn); setPrice(book.price); setAuthorId(book.authorId) }}
                 className="bg-yellow-400 px-3 py-1 rounded">Edit</button>
               <button onClick={() => handleDelete(book.id)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
