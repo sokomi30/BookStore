@@ -2,7 +2,7 @@
 
 [![.NET Build & Tests](https://github.com/sokomi30/BookStore/actions/workflows/dotnet.yml/badge.svg)](https://github.com/sokomi30/BookStore/actions/workflows/dotnet.yml)
 
-A RESTful web service for managing books and authors built with **.NET 10** and **PostgreSQL**.
+A full-stack web service for managing books and authors built with **.NET 10**, **React + TypeScript**, and **PostgreSQL**.
 
 ## 🚀 Tech Stack
 
@@ -26,6 +26,7 @@ A RESTful web service for managing books and authors built with **.NET 10** and 
 - **PostgreSQL** — Database (Docker)
 - **Docker Compose** — One-command startup
 - **GitHub Actions** — CI/CD pipeline
+- **Nginx** — Reverse proxy for frontend
 - **xUnit + Moq** — 32 tests (unit + integration)
 
 ## 📁 Architecture
@@ -35,35 +36,38 @@ BookStore.sln
 ├── BookStore.Domain          # Entities (Author, Book, User)
 ├── BookStore.Application     # DTOs, Services, Validators, AutoMapper
 ├── BookStore.Infrastructure  # EF Core, DbContext, Data Seeder
-└── BookStore.WebApi          # Controllers, Middleware, DI, Program.cs
+├── BookStore.WebApi          # Controllers, Middleware, DI, Program.cs
+└── BookStore.Web             # React + TypeScript frontend
 ```
 
-## 🚀 Full Startup Guide
+## 🔧 Getting Started
 
 ### Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+### Quick Start (one command)
+```bash
+git clone https://github.com/sokomi30/BookStore.git
+cd BookStore
+docker compose up -d --build
+```
+
+- **Frontend:** http://localhost:3000
+- **Swagger API:** http://localhost:5000/swagger
+
+### Stop
+```bash
+docker compose down
+```
+
+### Development (run manually)
+
+#### Prerequisites
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - [Node.js 20+](https://nodejs.org/)
 
-### Option 1: Docker (recommended — one command)
-
-```bash
-# Clone the repository
-git clone https://github.com/sokomi30/BookStore.git
-cd BookStore
-
-# Start everything (PostgreSQL + Redis + WebApi)
-docker compose up -d --build
-```
-
-Open Swagger: http://localhost:5000/swagger
-
-The frontend is included in the WebApi container.
-
-### Option 2: Manual Start (development)
-
 #### Backend
-
 ```bash
 # Start infrastructure
 docker compose up -d postgres redis
@@ -74,18 +78,15 @@ dotnet ef database update --project BookStore.Infrastructure --startup-project B
 # Run API
 dotnet run --project BookStore.WebApi
 ```
-
 API: http://localhost:5000/swagger
 
 #### Frontend
-
 ```bash
 cd BookStore.Web
 npm install
 npm run dev
 ```
-
-Frontend: http://localhost:5173 (or 5174)
+Frontend: http://localhost:5173
 
 ### Default Admin Account
 ```
@@ -94,34 +95,18 @@ Password: set in appsettings.Development.json
 ```
 
 ### Running Tests
-
 ```bash
 dotnet test
 ```
 
-### Stopping
-
-```bash
-# Docker
-docker compose down
-
-# Manual — Ctrl+C in each terminal
-```
-
-## 🔐 Authentication
-
-| Endpoint | Description | Access |
-|----------|-------------|--------|
-| `POST /api/auth/register` | Register new user | Public |
-| `POST /api/auth/login` | Login, get JWT token | Public (rate limited: 5/min) |
-
-### Default Admin (Development)
-```
-Username: admin
-Password: from appsettings.Development.json
-```
-
 ## 📡 API Endpoints
+
+### Auth
+| Method | URL | Description | Access |
+|--------|-----|-------------|--------|
+| POST | `/api/auth/register` | Register new user | Public |
+| POST | `/api/auth/login` | Login, get JWT tokens | Public |
+| POST | `/api/auth/refresh` | Refresh access token | Public |
 
 ### Books
 | Method | URL | Description | Access |
@@ -133,6 +118,7 @@ Password: from appsettings.Development.json
 | POST | `/api/books` | Create a book | Admin |
 | PUT | `/api/books/{id}` | Update a book | Admin |
 | DELETE | `/api/books/{id}` | Delete a book | Admin |
+| POST | `/api/books/{id}/cover` | Upload book cover | Admin |
 
 ### Authors
 | Method | URL | Description | Access |
@@ -146,11 +132,12 @@ Password: from appsettings.Development.json
 ## 🛡️ Security
 
 - **JWT** with role-based authorization (User / Admin)
+- **Refresh tokens** (7 days expiry)
 - **BCrypt** password hashing
-- **Rate limiting** on login endpoint (5 requests/min)
+- **Rate limiting** on login (5 requests/min)
 - **Input validation** via FluentValidation
 - **Global exception handling** middleware
-- **JWT key** stored in environment variables (not in repository)
+- **JWT key** stored in environment variables
 
 ## 📦 Seed Data
 
@@ -177,6 +164,13 @@ On first run, the application automatically creates **20 authors** and **100 boo
 - [x] Structured logging (Serilog)
 - [x] Redis caching
 
+### Frontend
+- [x] React + TypeScript SPA
+- [x] Tailwind CSS styling
+- [x] Dark / Light theme
+- [x] Admin panel (books & authors)
+- [x] Book cover upload
+
 ### DevOps
 - [x] Docker Compose (one-command run)
 - [x] CI/CD (GitHub Actions)
@@ -186,10 +180,3 @@ On first run, the application automatically creates **20 authors** and **100 boo
 - [x] Unit tests (25)
 - [x] Integration tests (7)
 - [ ] API tests (Postman / Bruno collection)
-
-### Frontend
-- [x] React + TypeScript SPA
-- [x] Tailwind CSS styling
-- [x] Dark / Light theme
-- [x] Admin panel (books & authors)
-- [ ] Book cover upload
