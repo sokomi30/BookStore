@@ -363,3 +363,8 @@ MigrationBackup/
 FodyWeavers.xsd
 
 appsettings.Development.json
+
+# Environment and confidential files
+.env.local
+.env.*.local
+interview_cheatsheet.md

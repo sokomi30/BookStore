@@ -30,6 +30,25 @@ namespace BookStore.Application.Services
             return author == null ? null : _mapper.Map<AuthorDto>(author);
         }
 
+        public async Task<PaginatedResult<AuthorDto>> GetPaginatedAsync(int page, int pageSize)
+        {
+            pageSize = Math.Clamp(pageSize, 1, 50);
+
+            var totalCount = await _context.Authors.CountAsync();
+            var authors = await _context.Authors
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PaginatedResult<AuthorDto>
+            {
+                Items = _mapper.Map<List<AuthorDto>>(authors),
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+        }
+
         public async Task<AuthorDto> CreateAsync(CreateAuthorDto dto)
         {
             var author = _mapper.Map<Author>(dto);

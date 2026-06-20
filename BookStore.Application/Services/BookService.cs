@@ -43,6 +43,15 @@ namespace BookStore.Application.Services
 
         public async Task<List<BookDto>> SearchAsync(string? title, string? author)
         {
+            // Валидация и очистка входных данных (защита от DoS)
+            const int maxSearchLength = 100;
+            
+            if (!string.IsNullOrWhiteSpace(title) && title.Length > maxSearchLength)
+                title = title[..maxSearchLength];
+            
+            if (!string.IsNullOrWhiteSpace(author) && author.Length > maxSearchLength)
+                author = author[..maxSearchLength];
+
             var query = _context.Books.Include(b => b.Author).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(title))
@@ -85,12 +94,21 @@ namespace BookStore.Application.Services
             return _mapper.Map<BookDto>(book);
         }
 
-        public async Task<BookDto?> UpdateAsync(int id, CreateBookDto dto)
+        public async Task<BookDto?> UpdateAsync(int id, UpdateBookDto dto)
         {
             var book = await _context.Books.FindAsync(id);
             if (book == null) return null;
 
-            _mapper.Map(dto, book);
+            // Обновляем только переданные поля
+            if (!string.IsNullOrEmpty(dto.ISBN))
+                book.ISBN = dto.ISBN;
+            
+            if (!string.IsNullOrEmpty(dto.Title))
+                book.Title = dto.Title;
+            
+            if (dto.Price.HasValue && dto.Price > 0)
+                book.Price = dto.Price.Value;
+
             await _context.SaveChangesAsync();
 
             await _cache.RemoveAsync("books:all");

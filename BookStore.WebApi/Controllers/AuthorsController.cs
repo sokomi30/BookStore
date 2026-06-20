@@ -27,6 +27,14 @@ namespace BookStore.WebApi.Controllers
             return Ok(authors);
         }
 
+        [HttpGet("paginated")]
+        [ProducesResponseType(typeof(PaginatedResult<AuthorDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPaginated([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _authorService.GetPaginatedAsync(page, pageSize);
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(AuthorDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

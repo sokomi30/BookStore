@@ -71,7 +71,7 @@ namespace BookStore.WebApi.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(BookDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] CreateBookDto dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateBookDto dto)
         {
             var book = await _bookService.UpdateAsync(id, dto);
             if (book == null) return NotFound();

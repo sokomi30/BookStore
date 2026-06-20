@@ -6,7 +6,7 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    // Serilog только если не в тестах
+    // Serilog пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
     if (!builder.Environment.IsEnvironment("Test"))
     {
         Log.Logger = new LoggerConfiguration()
@@ -24,6 +24,22 @@ try
         .AddBookStoreJsonOptions()
         .AddBookStoreValidation();
 
+    // CORS: С‚РѕР»СЊРєРѕ СѓРєР°Р·Р°РЅРЅС‹Рµ РґРѕРјРµРЅС‹
+    var allowedOrigins = builder.Configuration["Cors:AllowedOrigins"]?.Split(",") 
+        ?? new[] { "http://localhost:3000" };
+    
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("BookStorePolicy", policy =>
+        {
+            policy
+                .WithOrigins(allowedOrigins)
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        });
+    });
+
     var app = builder.Build();
 
     app.UseMiddleware<ExceptionMiddleware>();
@@ -33,7 +49,7 @@ try
         app.UseSerilogRequestLogging();
     }
 
-    app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+    app.UseCors("BookStorePolicy");
 
     app.UseRateLimiter();
     app.UseAuthentication();

@@ -35,7 +35,7 @@ services:
       - covers_data:/app/wwwroot/covers
     environment:
       - ConnectionStrings__Default=Host=postgres;Port=5432;Database=bookstore;Username=bookstore;Password=bookstore123
-      - JWT__Key=ThisIsASuperSecretKeyForJWT_AtLeast32Characters!
+      - JWT__Key=${JWT_KEY:-YourSuperSecretKeyThatIsAtLeast32CharactersLong!}
       - JWT__Issuer=BookStoreApi
       - JWT__Audience=BookStoreClient
       - Redis__ConnectionString=redis:6379

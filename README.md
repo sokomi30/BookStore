@@ -2,7 +2,9 @@
 
 [![.NET Build & Tests](https://github.com/sokomi30/BookStore/actions/workflows/dotnet.yml/badge.svg)](https://github.com/sokomi30/BookStore/actions/workflows/dotnet.yml)
 
-A full-stack web service for managing books and authors built with **.NET 10**, **React + TypeScript**, and **PostgreSQL**.
+A production-ready full-stack REST API for managing books and authors built with **.NET 10**, **React + TypeScript**, and **PostgreSQL**. Features enterprise-level security, optimized database design, and comprehensive validation.
+
+**📖 For detailed information about production improvements, see [IMPROVEMENTS_SUMMARY.md](IMPROVEMENTS_SUMMARY.md)**
 
 ## 🚀 Tech Stack
 
@@ -45,6 +47,24 @@ BookStore.sln
 ### Prerequisites
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
+### Environment Configuration
+Create `.env.local` in the project root for development (see [.env.example](.env.example) for reference):
+```bash
+# Database
+ConnectionStrings__Default=Host=localhost;Port=5432;Database=bookstore;Username=bookstore;Password=bookstore123
+
+# JWT
+Jwt__Key=YourSuperSecretKeyThatIsAtLeast32CharactersLong!
+Jwt__Issuer=BookStoreApi
+Jwt__Audience=BookStoreClient
+
+# Redis
+Redis__ConnectionString=localhost:6379
+
+# CORS
+Cors__AllowedOrigins=http://localhost:3000,http://localhost:5173,http://localhost:5000
+```
+
 ### Quick Start (one command)
 ```bash
 git clone https://github.com/sokomi30/BookStore.git
@@ -72,6 +92,12 @@ docker compose down
 # Start infrastructure
 docker compose up -d postgres redis
 
+# Configure environment
+# Option 1: Use .env.local file (see section above)
+# Option 2: Use User Secrets (.NET)
+cd BookStore.WebApi
+dotnet user-secrets set "Jwt:Key" "YourSuperSecretKeyThatIsAtLeast32CharactersLong!"
+
 # Apply migrations
 dotnet ef database update --project BookStore.Infrastructure --startup-project BookStore.WebApi
 
@@ -93,6 +119,17 @@ Frontend: http://localhost:5173
 Username: admin
 Password: set in appsettings.Development.json
 ```
+
+## 🔒 Security Features
+
+- ✅ **CORS Policy** — Restricted to specific origins (prevents CSRF)
+- ✅ **JWT Authentication** — Role-based access control (User / Admin)
+- ✅ **Input Validation** — FluentValidation with length constraints
+- ✅ **Error Handling** — Sanitized error messages in production
+- ✅ **Database Constraints** — MaxLength, Unique indexes, Foreign key restrictions
+- ✅ **Environment Variables** — Secure credential management (never hardcoded)
+
+See [IMPROVEMENTS_SUMMARY.md](IMPROVEMENTS_SUMMARY.md) for detailed security implementation.
 
 ### Running Tests
 ```bash
