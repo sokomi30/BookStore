@@ -150,12 +150,11 @@ namespace BookStore.Tests.Unit.Services
         public async Task UpdateAsync_ExistingBook_UpdatesBook()
         {
             // Arrange
-            var dto = new CreateBookDto
+            var dto = new UpdateBookDto
             {
                 ISBN = "1111111111",
                 Title = "Updated Book",
-                Price = 150,
-                AuthorId = 1
+                Price = 150
             };
 
             // Act
@@ -170,7 +169,7 @@ namespace BookStore.Tests.Unit.Services
         public async Task UpdateAsync_NonExistingBook_ReturnsNull()
         {
             // Act
-            var result = await _bookService.UpdateAsync(999, new CreateBookDto());
+            var result = await _bookService.UpdateAsync(999, new UpdateBookDto());
 
             // Assert
             Assert.Null(result);
